@@ -10,30 +10,30 @@ import createEditor from './editor'
 const store = createStore(rootReducer)
 
 const fakeStore = {
-	dispatch: (...args) => {
-		setTimeout(() => {
-			store.dispatch(...args)
-		}, 0) // Even a delay of 0 causes an issue...
-	}
+  dispatch: (...args) => {
+    setTimeout(() => {
+      store.dispatch(...args)
+    }, 0) // Even a delay of 0 causes an issue...
+  }
 }
 
 let delayDispatch = true
 createEditor(new Proxy(
-	store,
-	{
-		get: (target, key) => {
-			if (key === 'dispatch') {
-				return (...args) => {
+  store,
+  {
+    get: (target, key) => {
+      if (key === 'dispatch') {
+        return (...args) => {
           if (delayDispatch) {
             return fakeStore.dispatch(...args)
           } else {
             return store.dispatch(...args)
           }
         }
-			} else {
-				return target[key]
-			}
-		}
+      } else {
+        return target[key]
+      }
+    }
 }))
 
 const label = document.createElement('label')
